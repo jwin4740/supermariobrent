@@ -16,7 +16,7 @@ public class PlayScreen implements Screen {
     private OrthographicCamera gamecam;
     private Viewport gamePort;
 
-    public PlayScreen(MarioBros game, Viewport gamePort) {
+    public PlayScreen(MarioBros game) {
         this.game = game;
         texture = new Texture("badlogic.jpg");
         gamecam = new OrthographicCamera();
