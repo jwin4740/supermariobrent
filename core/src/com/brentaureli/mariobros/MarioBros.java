@@ -5,16 +5,18 @@ import com.badlogic.gdx.Game;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.brentaureli.mariobros.Screens.PlayScreen;
 
 public class MarioBros extends Game {
     public SpriteBatch batch;
     Texture img;
 
+
     @Override
     public void create() {
         batch = new SpriteBatch();
-        setScreen(new PlayScreen(this));
+        setScreen(new PlayScreen(this, ));
     }
 
 
