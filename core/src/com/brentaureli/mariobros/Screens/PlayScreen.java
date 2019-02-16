@@ -6,6 +6,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -20,13 +23,26 @@ public class PlayScreen implements Screen {
     private Viewport gamePort;
     private Hud hud;
 
+    private TmxMapLoader mapLoader;
+    private TiledMap map;
+    private OrthogonalTiledMapRenderer renderer;
+
     public PlayScreen(MarioBros game) {
         this.game = game;
         gamecam = new OrthographicCamera();
-//        gamePort = new ScreenViewport(gamecam);
-//        gamePort = new StretchViewport(800, 400, gamecam);
+
         gamePort = new FitViewport(MarioBros.V_WIDTH, MarioBros.V_HEIGHT, gamecam);
         hud = new Hud(game.batch);
+
+        mapLoader = new TmxMapLoader();
+        map = mapLoader.load("level1.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map);
+
+        //initially set our gamcam to be centered correctly at the start of of map
+        gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
+
+
+
     }
 
     @Override
@@ -34,19 +50,44 @@ public class PlayScreen implements Screen {
 
     }
 
+    public void handleInput(float dt) {
+        //control our player using immediate impulses
+        if (Gdx.input.isTouched()) {
+            gamecam.position.x += 100 * dt;
+
+        }
+
+    }
+
+    public void update(float dt) {
+        //handle user input first
+        handleInput(dt);
+
+        //update our gamecam with correct coordinates after changes
+        gamecam.update();
+        //tell our renderer to draw only what our camera can see in our game world.
+        renderer.setView(gamecam);
+
+    }
+
+
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0,0,0,1);
+        //separate our update logic from render
+        update(delta);
+
+        //Clear the game screen with Black
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        renderer.render();
+        //Set our batch to now draw what the Hud camera sees.
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
-    }
 
-    @Override
-    public void resize(int width, int height) {
-        gamePort.update(width, height);
 
     }
+
 
     @Override
     public void pause() {
@@ -66,5 +107,10 @@ public class PlayScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        gamePort.update(width, height);
     }
 }
